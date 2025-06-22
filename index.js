@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { Configuration, OpenAIApi } from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 dotenv.config();
 
@@ -24,4 +24,24 @@ app.listen(port, () => {
 });
 
 
+
+
 //Route penting
+app.post("/api/chat", async (req, res) => {
+    const userMessage = req.body.message;
+
+    if (!userMessage) {
+        return res.status(400).json({ error: "Message is required" });
+    }
+
+    try {
+        const result = await model.generateContent(userMessage);
+        const response = await result.response;
+        const text = response.text();
+
+        res.json({ reply: text });
+    } catch (error) {
+        console.error("Error in chat route:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
